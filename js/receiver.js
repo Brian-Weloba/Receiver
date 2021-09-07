@@ -1,5 +1,22 @@
 const context = cast.framework.CastReceiverContext.getInstance();
 const playerManager = context.getPlayerManager();
+const playbackConfig = new cast.framework.playbackConfig();
+
+//Customize the license for playback
+playbackConfig.licenceUrl = '';
+playbackConfig.protectionSystem = cast.framework.ContentProtection.WIDEVINE;
+playbackConfig.licenseRequestHandler = requestInfo => {
+    requestInfo.withCredentials = true;
+}
+context.start({playbackConfig: playbackConfig});
+
+//Update playback config licenseUrl accoding to the provided value in load request
+context.getPlayerManager().setMediaPlaybackInfoHandler((loadRequest,playbackConfig)=>{
+    if (loadRequest.media.customData && loadRequest.media.customData.licenseUrl) {
+        playbackConfig.licenceUrl = loadRequest.media.customData,licenceUrl;
+    }
+    return playbackConfig;
+});
 
 //Debug Logger
 const castDebugger = cast.debug.CastDebugLogger.getInstance();
